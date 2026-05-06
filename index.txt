@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Tablero BN · Colegio Americano de Barranquilla</title>
+<style>
+  :root {
+    --navy: #0A2D73;
+    --amber: #EC8906;
+    --teal: #197AA4;
+    --ocean: #0C6594;
+    --pearl: #F4F5F7;
+    --red: #C0392B;
+    --green: #1A7A4A;
+    --gray: #888;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Tahoma, sans-serif; background: #F0F2F5; color: #1a1a1a; min-height: 100vh; }
+
+  .shell { max-width: 980px; margin: 0 auto; padding: 24px 20px 48px; }
+
+  /* BANNER PÚBLICO */
+  .public-banner {
+    background: linear-gradient(135deg, #1A7A4A 0%, #145c38 100%);
+    color: #fff; border-radius: 8px; padding: 10px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; font-size: 11px;
+  }
+  .public-banner-left { display: flex; align-items: center; gap: 8px; }
+  .public-dot { width: 8px; height: 8px; border-radius: 50%; background: #6ee7a7; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .public-banner strong { font-size: 12px; }
+  .public-banner span { opacity: 0.85; }
+
+  /* HEADER */
+  .top-bar {
+    background: var(--navy);
+    color: #fff;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 10px 10px 0 0;
+  }
+  .top-bar-left { display: flex; align-items: center; gap: 14px; }
+  .cab-logo-circle {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .cab-logo-circle svg { width: 28px; height: 28px; }
+  .top-bar h1 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .top-bar p { font-size: 11px; opacity: 0.75; margin-top: 2px; }
+  .bn-badge {
+    background: var(--amber); color: #fff;
+    font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 5px;
+    text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap;
+  }
+  .top-stripe { height: 4px; background: var(--amber); border-radius: 0; }
+
+  /* CARD */
+  .card {
+    background: #fff; border-radius: 10px;
+    padding: 18px 18px 14px; margin-bottom: 16px;
+    border: 1px solid #e0e4ea;
+  }
+  .section-title {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--teal); margin-bottom: 12px;
+    padding-bottom: 6px; border-bottom: 1.5px solid var(--pearl);
+  }
+
+  /* METRICS */
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .metric-box {
+    background: var(--pearl); border-radius: 8px; padding: 10px 12px;
+    text-align: center; border-left: 3px solid var(--teal);
+  }
+  .metric-box .m-val { font-size: 22px; font-weight: 700; color: var(--navy); }
+  .metric-box .m-label { font-size: 10px; color: #555; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* RINGS */
+  .rings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .ring-card {
+    background: #fff; border: 1.5px solid #e0e4ea; border-radius: 10px;
+    padding: 12px 8px 10px; display: flex; flex-direction: column;
+    align-items: center; gap: 5px; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .ring-card:hover { border-color: var(--amber); box-shadow: 0 2px 10px rgba(236,137,6,0.15); }
+  .ring-card.active { border-color: var(--amber); box-shadow: 0 2px 12px rgba(236,137,6,0.2); }
+  .ring-pct { font-size: 13px; font-weight: 700; color: var(--navy); }
+  .ring-label { font-size: 10px; font-weight: 700; color: #555; text-align: center; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.3; }
+  .ring-estado { font-size: 9px; padding: 2px 6px; border-radius: 3px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* DETAIL PANEL */
+  .detail-panel {
+    background: var(--pearl); border-radius: 8px; padding: 14px 16px;
+    margin-top: 10px; display: none; animation: fadeIn 0.2s ease;
+  }
+  .detail-panel.open { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+  .detail-title { font-size: 12px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+  .actions-list { list-style: none; }
+  .actions-list li {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 6px 0; border-bottom: 1px solid #dde2ea; font-size: 11.5px; line-height: 1.45;
+  }
+  .actions-list li:last-child { border-bottom: none; }
+  /* Checkbox solo visual, no interactivo */
+  .chk {
+    width: 16px; height: 16px; border-radius: 4px;
+    border: 2px solid #bcc4d0; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px; background: #fff;
+    cursor: default;
+  }
+  .chk.done { background: var(--teal); border-color: var(--teal); }
+  .chk.done::after {
+    content: ''; width: 7px; height: 5px;
+    border-left: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(-45deg) translateY(-1px);
+  }
+
+  /* FASES */
+  .fases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .fase-card {
+    background: #fff; border: 1.5px solid #e0e4ea; border-radius: 10px;
+    padding: 12px 12px 10px; cursor: pointer; transition: border-color 0.15s;
+  }
+  .fase-card:hover { border-color: var(--teal); }
+  .fase-card.active { border-color: var(--teal); box-shadow: 0 2px 10px rgba(25,122,164,0.15); }
+  .fase-num { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #888; }
+  .fase-title { font-size: 11.5px; font-weight: 700; color: var(--navy); margin: 3px 0 2px; line-height: 1.3; }
+  .fase-periodo { font-size: 10px; color: #666; margin-bottom: 7px; }
+  .bar-bg { height: 5px; background: #e5e9f0; border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+  .fase-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+  .fase-status { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+  .fase-pct-txt { font-size: 10px; font-weight: 700; color: var(--navy); }
+
+  /* HITOS */
+  .hitos-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .hito-card {
+    background: #fff; border-radius: 8px; padding: 10px 9px 8px;
+    border: 1px solid #e0e4ea; border-top: 3px solid var(--gray);
+  }
+  .hito-card.proximo { border-top-color: var(--amber); }
+  .hito-card.completado { border-top-color: var(--green); }
+  .hito-num { font-size: 10px; font-weight: 700; color: var(--amber); letter-spacing: 0.04em; }
+  .hito-fecha { font-size: 11px; font-weight: 700; color: var(--navy); margin: 2px 0 3px; }
+  .hito-desc { font-size: 10px; color: #555; line-height: 1.35; }
+
+  /* RIESGOS */
+  .riesgos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .riesgo-row {
+    display: flex; align-items: flex-start; gap: 9px;
+    padding: 9px 11px; border-radius: 8px; background: #fff;
+    border: 1px solid #e0e4ea;
+  }
+  .riesgo-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+  .riesgo-tag { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+  .riesgo-text { font-size: 11px; color: #333; line-height: 1.4; margin-top: 2px; }
+
+  /* FOOTER */
+  .footer-bar {
+    background: var(--navy); border-radius: 0 0 10px 10px;
+    padding: 10px 20px; display: flex; align-items: center;
+    justify-content: space-between; color: #fff; font-size: 11px;
+  }
+  .footer-bar p { opacity: 0.75; }
+  .footer-update { font-size: 10px; opacity: 0.6; font-style: italic; }
+
+  /* PROGRESS BAR GLOBAL */
+  .global-bar-wrap { margin-bottom: 16px; }
+  .global-bar-label { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .global-bar-label span { font-size: 11px; color: #555; }
+  .global-bar-label strong { font-size: 11px; color: var(--navy); font-weight: 700; }
+  .global-bar-bg { height: 8px; background: #e5e9f0; border-radius: 4px; overflow: hidden; }
+  .global-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(to right, var(--teal), var(--amber)); transition: width 0.5s; }
+
+  .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- BANNER PÚBLICO -->
+  <div class="public-banner">
+    <div class="public-banner-left">
+      <div class="public-dot"></div>
+      <div>
+        <strong>Vista pública · Consulta de avance</strong>
+        <span> — Esta página se actualiza periódicamente. No requiere contraseña.</span>
+      </div>
+    </div>
+    <span>Última actualización: <strong>6 de mayo de 2026</strong></span>
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="cab-logo-circle">
+        <svg viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="13" fill="#0A2D73" stroke="#EC8906" stroke-width="1.5"/>
+          <text x="14" y="18.5" text-anchor="middle" font-family="Tahoma,sans-serif" font-size="9" font-weight="bold" fill="#fff">CAB</text>
+        </svg>
+      </div>
+      <div>
+        <h1>Tablero de Control · Denominación Bilingüe Nacional</h1>
+        <p>Colegio Americano de Barranquilla · Circular 00009 · Vigencia: Abril 2026 – Septiembre 2027</p>
+      </div>
+    </div>
+    <div class="bn-badge">BN 2027</div>
+  </div>
+  <div class="top-stripe"></div>
+
+  <!-- METRICS -->
+  <div style="margin-top:16px;"></div>
+  <div class="metrics-grid" id="metricsGrid"></div>
+
+  <!-- COMPONENTES -->
+  <div class="card">
+    <div class="section-title">Componentes Circular 00009 — clic para ver acciones</div>
+    <div class="global-bar-wrap">
+      <div class="global-bar-label"><span>Avance global del proceso</span><strong id="globalPctTxt">0%</strong></div>
+      <div class="global-bar-bg"><div class="global-bar-fill" id="globalBar" style="width:0%"></div></div>
+    </div>
+    <div class="rings-grid" id="ringsGrid"></div>
+    <div class="detail-panel" id="compDetail">
+      <div class="detail-title" id="compDetailTitle"></div>
+      <ul class="actions-list" id="compDetailList"></ul>
+    </div>
+  </div>
+
+  <!-- FASES -->
+  <div class="card">
+    <div class="section-title">Fases de implementación — clic para ver acciones</div>
+    <div class="fases-grid" id="fasesGrid"></div>
+    <div class="detail-panel" id="faseDetail">
+      <div class="detail-title" id="faseDetailTitle"></div>
+      <ul class="actions-list" id="faseDetailList"></ul>
+    </div>
+  </div>
+
+  <!-- HITOS + RIESGOS -->
+  <div class="two-cols">
+    <div class="card">
+      <div class="section-title">Hitos de decisión del Consejo Directivo</div>
+      <div class="hitos-grid" id="hitosGrid"></div>
+    </div>
+    <div class="card">
+      <div class="section-title">Gestión de riesgos</div>
+      <div class="riesgos-grid" id="riesgosGrid"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer-bar">
+    <p>Yuddy Pérez · Líder de Internacionalización y Bilingüismo · Conforme a Circular 00009 · SED Barranquilla</p>
+    <p class="footer-update">Documento de consulta pública · Se actualiza cada 8 días</p>
+  </div>
+
+</div>
+
+<script>
+// ── DATOS DEL TABLERO ── (actualizar done: true/false al hacer seguimiento)
+// ÚLTIMA ACTUALIZACIÓN: 29 de abril de 2026
+
+const componentes = [
+  {
+    id: 'pei', label: 'PEI Bilingüe', estado: 'En proceso', estadoColor: '#EC8906',
+    items: [
+      { text: 'Identificar secciones del PEI vigente a modificar', done: true },
+      { text: 'Redactar política institucional de bilingüismo (articulada Circular 00009)', done: false },
+      { text: 'Integrar MCER como referente curricular en el PEI', done: false },
+      { text: 'Resolver inconsistencia denominación pruebas (Habilmind vs Lexiun)', done: false },
+      { text: 'Aval Consejo Académico (HD-2, jun 2026)', done: false },
+      { text: 'Aprobación formal Consejo Directivo (HD-2, jun 2026)', done: false },
+    ]
+  },
+  {
+    id: 'curriculo', label: 'Currículo Bilingüe', estado: 'Pendiente', estadoColor: '#888',
+    items: [
+      { text: 'Diseño mallas ES/EN Social Studies 1° (pilotaje activo)', done: true },
+      { text: 'Diseño mallas ES/EN Social Studies 2° (pilotaje activo)', done: true },
+      { text: 'Diseño mallas ES/EN Social Studies 3° (pilotaje activo)', done: true },
+      { text: 'Proyección escenario +50% plan de estudios en inglés', done: false },
+      { text: 'Identificar áreas, escenario acordado y ruta de transición', done: false },
+      { text: 'Mallas adicionales por áreas priorizadas (nuevas)', done: false },
+      { text: 'Cierre diseño mallas todas las áreas bilingües (may 2027)', done: false },
+    ]
+  },
+  {
+    id: 'docentes', label: 'Docentes y Metodología', estado: 'En proceso', estadoColor: '#EC8906',
+    items: [
+      { text: 'Entrevistas semiestructuradas individuales a docentes', done: true },
+      { text: 'Encuesta de caracterización docente (5 secciones, diseñada y lista)', done: true },
+      { text: 'Aplicación encuesta caracterización docente (envío pendiente)', done: false },
+      { text: 'Diagnóstico nivel MCER a todos los docentes (may 2026)', done: false },
+      { text: 'Mapeo docente completo y análisis de brechas', done: false },
+      { text: 'Ruta 1: Inicio formación en lengua 100% docentes (jun 2026)', done: false },
+      { text: 'Ruta 2: Mín. 2 talleres CLIL docentes en transición (2026)', done: false },
+      { text: 'Ruta 3: Coaching aula pilotaje Social Studies (activo)', done: true },
+      { text: 'Certificación MCER docentes de inglés (C1)', done: false },
+      { text: 'Certificación MCER docentes de área en inglés (B2)', done: false },
+    ]
+  },
+  {
+    id: 'infra', label: 'Infraestructura y Recursos', estado: 'Base parcial', estadoColor: '#197AA4',
+    items: [
+      { text: 'Plataforma LMS 4.0 Santillana-UNOi operativa (existente)', done: true },
+      { text: 'Plataforma MyOn +3.500 obras en inglés (existente)', done: true },
+      { text: 'Plataforma Improve operativa (existente)', done: true },
+      { text: 'Inventario formal recursos físicos existentes', done: false },
+      { text: 'Inventario formal recursos digitales para enseñanza bilingüe', done: false },
+      { text: 'Propuesta adquisición materiales impresos en inglés (Fase 2)', done: false },
+      { text: 'Adquisición textos, guías y materiales bilingües', done: false },
+      { text: 'Integración explícita recursos al modelo BN como evidencia', done: false },
+    ]
+  },
+  {
+    id: 'examen', label: 'Examen Internacional', estado: 'Pendiente', estadoColor: '#888',
+    items: [
+      { text: 'Examen Cambridge aplicado en grados 5°, 9°, 11° (existente)', done: true },
+      { text: 'Articulación Cambridge al SIEE — propuesta (Consejo Académico)', done: false },
+      { text: 'Aprobación Consejo Directivo SIEE modificado (HD-3, jul 2026)', done: false },
+      { text: 'Diseño currículo preparación Cambridge grado 5°', done: false },
+      { text: 'Diseño currículo preparación Cambridge grado 9°', done: false },
+      { text: 'Diseño currículo preparación Cambridge grado 11°', done: false },
+      { text: 'Implementación currículo preparación Cambridge (ene 2027)', done: false },
+    ]
+  },
+  {
+    id: 'intercultural', label: 'Orientación Intercultural', estado: 'En proceso', estadoColor: '#EC8906',
+    items: [
+      { text: 'Convenio Cambridge activo y operativo', done: true },
+      { text: 'Campamentos y EF Challenge activos (EF Education First)', done: true },
+      { text: 'Alianza Canadiense activa', done: true },
+      { text: 'Dual Diploma Advantages School International (convenio activo)', done: true },
+      { text: 'Sistematizar evidencias y registros de actividades interculturales', done: false },
+      { text: 'Portafolio intercultural: construcción inicial (sep–nov 2026)', done: false },
+      { text: 'Mín. 3 actividades interculturales documentadas en 2026', done: false },
+      { text: 'Consolidación portafolio completo (2027)', done: false },
+    ]
+  },
+  {
+    id: 'social', label: 'Socialización Comunidad', estado: 'Pendiente', estadoColor: '#888',
+    items: [
+      { text: 'Primera socialización docentes, estudiantes y familias (ago 2026)', done: false },
+      { text: 'Acta del Consejo Directivo aprobando el modelo BN', done: false },
+      { text: 'Registro y acta con lista de participantes (1a socialización)', done: false },
+      { text: 'Segunda socialización comunidad educativa (abr 2027)', done: false },
+      { text: 'Evidencias acumuladas de participación comunitaria para dossier', done: false },
+    ]
+  },
+  {
+    id: 'dossier', label: 'Dossier BN Final', estado: 'En construcción', estadoColor: '#0A2D73',
+    items: [
+      { text: 'Repositorio de evidencias instalado (tablero BN operativo)', done: true },
+      { text: 'Solicitud formal (carta Rectora a IVC)', done: false },
+      { text: 'Acta del Consejo Directivo aprobación modelo BN', done: false },
+      { text: 'PEI actualizado con política de bilingüismo', done: false },
+      { text: 'Plan de estudios +50% instrucción en inglés (mallas)', done: false },
+      { text: 'Caracterización docente completa (identidad, MCER, cert.)', done: false },
+      { text: 'Inventario de recursos didácticos y digitales', done: false },
+      { text: 'Plan de examen internacional (Cambridge + preparación)', done: false },
+      { text: 'Infraestructura y dotación (Art. 138 Ley 115/1994)', done: false },
+      { text: 'Plan de atención al estudiantado articulado con el SIEE', done: false },
+      { text: 'Evidencia orientación intercultural (registros actividades)', done: false },
+      { text: 'Evidencia socialización comunidad educativa', done: false },
+      { text: 'Auditoría interna checklist Circular 00009 (jun-jul 2027)', done: false },
+      { text: 'Curaduría y control de versiones del repositorio', done: false },
+      { text: 'Aprobación dossier Consejo Directivo (HD-5, ago 2027)', done: false },
+      { text: 'Radicación formal ante IVC-SED (sep 2027)', done: false },
+    ]
+  },
+];
+
+const fases = [
+  {
+    id:'f1', num:'Fase 1', title:'Diagnóstico y alistamiento', periodo:'Abr–May 2026', status:'en-curso',
+    items:[
+      { text:'Entrevistas semiestructuradas individuales a docentes', done:true },
+      { text:'Encuesta de caracterización docente (diseñada y lista)', done:true },
+      { text:'Aplicación encuesta de caracterización', done:true },
+      { text:'Revisión documental (PEI, SIEE, mallas, pruebas)', done:true },
+      { text:'Diagnóstico nivel MCER a docentes', done:true },
+      { text:'Instalación tablero de control BN y repositorio', done:true },
+      { text:'Construcción Plan de Implementación BN 2026–2027', done:true },
+      { text:'HD-1: Presentación diagnóstico al Consejo Directivo (may 2026)', done:false },
+    ]
+  },
+  {
+    id:'f2', num:'Fase 2', title:'Diseño y alistamiento', periodo:'May–Ago 2026', status:'proxima',
+    items:[
+      { text:'Ajuste del PEI con política institucional de bilingüismo', done:false },
+      { text:'HD-2: Aprobación política BN (C. Académico y C. Directivo, jun)', done:false },
+      { text:'Mapeo docente completo y análisis de brechas', done:false },
+      { text:'Proyección +50% plan de estudios en inglés', done:false },
+      { text:'Mallas ES/EN Social Studies 1°–3° (primer entregable)', done:true },
+      { text:'Inventario recursos físicos y digitales', done:false },
+      { text:'Propuesta y adquisición de materiales bilingües', done:false },
+      { text:'Articulación Cambridge al SIEE (C. Académico y C. Directivo)', done:false },
+      { text:'HD-3: Aprobación SIEE + espacios formación (jul 2026)', done:false },
+      { text:'Diseño currículo preparación Cambridge (5°, 9°, 11°)', done:false },
+      { text:'Primera socialización con la comunidad educativa (ago 2026)', done:false },
+    ]
+  },
+  {
+    id:'f3', num:'Fase 3', title:'Formación e inicio de pilotaje', periodo:'Jun–Nov 2026', status:'pendiente',
+    items:[
+      { text:'Ruta 1: Inicio formación en lengua todos los docentes (jun 2026)', done:false },
+      { text:'Ruta 2: Talleres CLIL docentes en transición (mín. 2 talleres)', done:false },
+      { text:'Ruta 3: Coaching aula pilotaje Social Studies', done:false },
+      { text:'Pilotaje en áreas focalizadas con formación y planeación CLIL', done:false },
+      { text:'Construcción progresiva mallas ES/EN nuevas áreas priorizadas', done:false },
+      { text:'Portafolio intercultural: construcción inicial', done:false },
+      { text:'Visita revisión Doris Domínguez, Supervisora SED (oct 2026)', done:false },
+      { text:'Informe de cierre año 2026', done:false },
+      { text:'HD-4: Informe cierre 2026 al Consejo Directivo (nov 2026)', done:false },
+    ]
+  },
+  {
+    id:'f4', num:'Fase 4', title:'Implementación plena', periodo:'Ene–May 2027', status:'pendiente',
+    items:[
+      { text:'Ruta 1: Continuación formación en lengua año 2 (todos)', done:false },
+      { text:'Rutas 2 y 3: Continuación talleres CLIL y coaching de aula', done:false },
+      { text:'Expansión pilotaje a todas las áreas y grados proyectados', done:false },
+      { text:'Cierre diseño mallas ES/EN todas las áreas bilingües', done:false },
+      { text:'Implementación currículo Cambridge 5°, 9°, 11°', done:false },
+      { text:'Consolidación portafolio intercultural', done:false },
+      { text:'Segunda socialización con la comunidad educativa (abr 2027)', done:false },
+    ]
+  },
+  {
+    id:'f5', num:'Fase 5', title:'Consolidación del Dossier BN', periodo:'Jun–Ago 2027', status:'pendiente',
+    items:[
+      { text:'Auditoría interna checklist Circular 00009', done:false },
+      { text:'Curaduría y control de versiones del repositorio', done:false },
+      { text:'Consolidación Dossier BN completo (11 documentos)', done:false },
+      { text:'HD-5: Aprobación Dossier BN — Consejo Directivo (ago 2027)', done:false },
+      { text:'Carta formal de solicitud a la SED (Rectoría)', done:false },
+    ]
+  },
+  {
+    id:'f6', num:'Fase 6', title:'Radicación', periodo:'Sep 2027', status:'pendiente',
+    items:[
+      { text:'Radicación formal del Dossier ante Oficina IVC de la SED', done:false },
+      { text:'Etapa posterior: estudio de documentos y visita SED', done:false },
+      { text:'Expedición Resolución Denominación Bilingüe Nacional', done:false },
+    ]
+  },
+];
+
+const hitos = [
+  { num:'HD-1', fecha:'Mayo 2026', desc:'Aprobación informe diagnóstico y Plan BN 2026–2027', status:'proximo' },
+  { num:'HD-2', fecha:'Junio 2026', desc:'Aprobación política BN en el PEI (C. Académico y C. Directivo)', status:'pendiente' },
+  { num:'HD-3', fecha:'Julio 2026', desc:'Aprobación SIEE + espacios de formación (Dir. Administrativa)', status:'pendiente' },
+  { num:'HD-4', fecha:'Nov 2026', desc:'Aprobación informe cierre de año y validación del avance', status:'pendiente' },
+  { num:'HD-5', fecha:'Ago 2027', desc:'Aprobación Dossier BN completo y firma acta radicación SED', status:'pendiente' },
+];
+
+const riesgos = [
+  { texto:'Nivel MCER insuficiente del cuerpo docente', nivel:'Alta / Crítico', color:'#C0392B' },
+  { texto:'Cruce del calendario con espacios de formación', nivel:'Alta / Alto', color:'#C0392B' },
+  { texto:'Resistencia docente a la evaluación de nivel', nivel:'Media / Alto', color:'#EC8906' },
+  { texto:'Demora en actualización y aprobación del PEI', nivel:'Media / Alto', color:'#EC8906' },
+  { texto:'Dossier incompleto al momento de radicación', nivel:'Baja / Crítico', color:'#197AA4' },
+  { texto:'Cambios en normativa o criterios de verificación SED', nivel:'Baja / Medio', color:'#197AA4' },
+];
+
+// ── FUNCIONES RENDER (solo lectura) ──
+
+function calcPct(items) {
+  if (!items.length) return 0;
+  return Math.round(items.filter(i => i.done).length / items.length * 100);
+}
+
+function makeRingSVG(pct, color, size=52) {
+  const r = 20, cx = size/2, cy = size/2;
+  const circ = 2 * Math.PI * r;
+  const dash = (pct / 100) * circ;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e5e9f0" stroke-width="5"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="5"
+      stroke-dasharray="${dash.toFixed(1)} ${(circ-dash).toFixed(1)}"
+      stroke-dashoffset="${(circ/4).toFixed(1)}"
+      stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>
+  </svg>`;
+}
+
+function statusColor(st) {
+  if (st==='en-curso') return '#EC8906';
+  if (st==='proxima') return '#197AA4';
+  return '#aaa';
+}
+function statusLabel(st) {
+  if (st==='en-curso') return 'En curso';
+  if (st==='proxima') return 'Próxima';
+  return 'Pendiente';
+}
+
+let activeComp = null, activeFase = null;
+
+function globalPct() {
+  const all = [...componentes.map(c=>c.items), ...fases.map(f=>f.items)].flat();
+  return Math.round(all.filter(i=>i.done).length / all.length * 100);
+}
+
+function renderMetrics() {
+  const totalItems = componentes.reduce((s,c)=>s+c.items.length,0);
+  const doneItems = componentes.reduce((s,c)=>s+c.items.filter(i=>i.done).length,0);
+  const fasesDone = fases.filter(f=>calcPct(f.items)===100).length;
+  const metrics = [
+    { val: Math.round(doneItems/totalItems*100)+'%', label: 'Avance componentes' },
+    { val: doneItems+'/'+totalItems, label: 'Acciones completadas' },
+    { val: fasesDone+'/6', label: 'Fases completadas' },
+    { val: 'Sep 2027', label: 'Meta radicación' },
+  ];
+  const grid = document.getElementById('metricsGrid');
+  grid.innerHTML = '';
+  metrics.forEach(m => {
+    const box = document.createElement('div');
+    box.className = 'metric-box';
+    box.innerHTML = `<div class="m-val">${m.val}</div><div class="m-label">${m.label}</div>`;
+    grid.appendChild(box);
+  });
+}
+
+function renderGlobal() {
+  const pct = globalPct();
+  document.getElementById('globalPctTxt').textContent = pct+'%';
+  document.getElementById('globalBar').style.width = pct+'%';
+}
+
+function renderRings() {
+  const grid = document.getElementById('ringsGrid');
+  grid.innerHTML = '';
+  componentes.forEach((c, ci) => {
+    const pct = calcPct(c.items);
+    const card = document.createElement('div');
+    card.className = 'ring-card' + (activeComp===ci?' active':'');
+    card.innerHTML = makeRingSVG(pct, c.estadoColor) +
+      `<div class="ring-pct">${pct}%</div>` +
+      `<div class="ring-label">${c.label}</div>` +
+      `<div class="ring-estado" style="background:${c.estadoColor}22;color:${c.estadoColor}">${c.estado}</div>`;
+    card.onclick = () => { activeComp = activeComp===ci ? null : ci; renderRings(); renderCompDetail(); };
+    grid.appendChild(card);
+  });
+}
+
+function renderCompDetail() {
+  const panel = document.getElementById('compDetail');
+  const title = document.getElementById('compDetailTitle');
+  const list = document.getElementById('compDetailList');
+  if (activeComp===null) { panel.classList.remove('open'); return; }
+  const c = componentes[activeComp];
+  panel.classList.add('open');
+  const done = c.items.filter(i=>i.done).length;
+  title.textContent = c.label + ' · ' + done + '/' + c.items.length + ' acciones completadas · Estado: ' + c.estado;
+  list.innerHTML = '';
+  c.items.forEach(item => {
+    const li = document.createElement('li');
+    const chk = document.createElement('div');
+    chk.className = 'chk' + (item.done?' done':'');
+    // Solo visual — sin onclick
+    li.appendChild(chk);
+    const txt = document.createElement('span');
+    txt.textContent = item.text;
+    if (item.done) txt.style.color = '#888';
+    li.appendChild(txt);
+    list.appendChild(li);
+  });
+}
+
+function renderFases() {
+  const grid = document.getElementById('fasesGrid');
+  grid.innerHTML = '';
+  const colors = ['#EC8906','#197AA4','#197AA4','#0A2D73','#0A2D73','#0A2D73'];
+  fases.forEach((f, fi) => {
+    const pct = calcPct(f.items);
+    const col = colors[fi];
+    const card = document.createElement('div');
+    card.className = 'fase-card' + (activeFase===fi?' active':'');
+    card.innerHTML = `<div class="fase-num">${f.num}</div>
+      <div class="fase-title">${f.title}</div>
+      <div class="fase-periodo">${f.periodo}</div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${pct}%;background:${col}"></div></div>
+      <div class="fase-foot">
+        <div class="fase-status" style="color:${statusColor(f.status)}">${statusLabel(f.status)}</div>
+        <div class="fase-pct-txt">${pct}%</div>
+      </div>`;
+    card.onclick = () => { activeFase = activeFase===fi ? null : fi; renderFases(); renderFaseDetail(); };
+    grid.appendChild(card);
+  });
+}
+
+function renderFaseDetail() {
+  const panel = document.getElementById('faseDetail');
+  const title = document.getElementById('faseDetailTitle');
+  const list = document.getElementById('faseDetailList');
+  if (activeFase===null) { panel.classList.remove('open'); return; }
+  const f = fases[activeFase];
+  panel.classList.add('open');
+  const done = f.items.filter(i=>i.done).length;
+  title.textContent = f.num + ': ' + f.title + ' · ' + f.periodo + ' · ' + done + '/' + f.items.length + ' acciones';
+  list.innerHTML = '';
+  f.items.forEach(item => {
+    const li = document.createElement('li');
+    const chk = document.createElement('div');
+    chk.className = 'chk' + (item.done?' done':'');
+    // Solo visual — sin onclick
+    li.appendChild(chk);
+    const txt = document.createElement('span');
+    txt.textContent = item.text;
+    if (item.done) txt.style.color = '#888';
+    li.appendChild(txt);
+    list.appendChild(li);
+  });
+}
+
+function renderHitos() {
+  const grid = document.getElementById('hitosGrid');
+  grid.innerHTML = '';
+  hitos.forEach(h => {
+    const card = document.createElement('div');
+    card.className = 'hito-card ' + h.status;
+    card.innerHTML = `<div class="hito-num">${h.num}</div>
+      <div class="hito-fecha">${h.fecha}</div>
+      <div class="hito-desc">${h.desc}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function renderRiesgos() {
+  const grid = document.getElementById('riesgosGrid');
+  grid.innerHTML = '';
+  riesgos.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'riesgo-row';
+    row.innerHTML = `<div class="riesgo-dot" style="background:${r.color}"></div>
+      <div>
+        <div class="riesgo-tag" style="color:${r.color}">${r.nivel}</div>
+        <div class="riesgo-text">${r.texto}</div>
+      </div>`;
+    grid.appendChild(row);
+  });
+}
+
+renderMetrics();
+renderGlobal();
+renderRings();
+renderCompDetail();
+renderFases();
+renderFaseDetail();
+renderHitos();
+renderRiesgos();
+</script>
+</body>
+</html>
