@@ -885,7 +885,7 @@
 
 <div class="toast" id="toast">✅ Done!</div>
 
-<script>
+<script>const SUPABASE_URL = 'https://snaplyxsmtxftypygxhc.supabase.co'; const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYXBseXhzbXR4ZnR5cHlneGhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMzA4MzcsImV4cCI6MjEwMTYwNjgzN30.hRRHaXPjTk1LET6SSTp5mDZB-z2-ci-Y7iK3LBefBMA';
 const weeklyPhrases = [
   {week:1, phrase:"Good morning, everyone!", response:"Good morning! Ready to start?", category:"Opening", context:"Use at the beginning of every class to create a warm, consistent routine."},
   {week:2, phrase:"Please take out your materials.", response:"Take out your notebook and pencil.", category:"Instructions", context:"Use when students need to prepare for the lesson."},
@@ -1023,29 +1023,54 @@ function renderExpressionCards(cat) {
     </div>`).join('');
 }
 
-function renderGarden() {
-  const target=48, goal=100;
-  const pct=Math.round(target/goal*100);
-  let current=0;
-  const iv = setInterval(()=>{
-    current=Math.min(current+2,target);
-    document.getElementById('gardenCount').textContent=current;
-    if(current>=target) clearInterval(iv);
-  },30);
-  setTimeout(()=>{
-    document.getElementById('gardenProgress').style.width=pct+'%';
-    document.getElementById('progressPct').textContent=pct+'%';
-  },200);
-  const flowers=['🌸','🌼','🌺','🌻','🌷','💐'];
-  const grid=document.getElementById('flowersGrid');
-  grid.innerHTML='';
-  for(let i=0;i<target;i++){
-    const f=document.createElement('span');
-    f.className='flower';
-    f.textContent=flowers[i%flowers.length];
-    f.style.animationDelay=(i*0.03)+'s';
-    grid.appendChild(f);
+async function renderGarden() {
+  const goal = 100;
+  const grid = document.getElementById('flowersGrid');
+  grid.innerHTML = '<p style="opacity:0.6">Loading the garden…</p>';
+
+  let flowersData = [];
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/flowers?select=teacher_name,subject,challenge&order=created_at.desc`,
+      { headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    flowersData = await res.json();
+  } catch (e) {
+    console.error('Error loading garden from Supabase', e);
   }
+
+  const target = flowersData.length;
+  const pct = Math.min(100, Math.round((target / goal) * 100));
+
+  let current = 0;
+  const step = Math.max(1, Math.ceil(target / 30));
+  const iv = setInterval(() => {
+    current = Math.min(current + step, target);
+    document.getElementById('gardenCount').textContent = current;
+    if (current >= target) clearInterval(iv);
+  }, 30);
+
+  setTimeout(() => {
+    document.getElementById('gardenProgress').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+  }, 200);
+
+  const flowerEmojis = ['🌸','🌼','🌺','🌻','🌷','💐'];
+  grid.innerHTML = '';
+
+  if (target === 0) {
+    grid.innerHTML = '<p style="opacity:0.6">No flowers yet — be the first approved evidence of the week!</p>';
+    return;
+  }
+
+  flowersData.forEach((flower, i) => {
+    const f = document.createElement('span');
+    f.className = 'flower';
+    f.textContent = flowerEmojis[i % flowerEmojis.length];
+    f.title = flower.teacher_name || 'Docente';
+    f.style.animationDelay = (i * 0.03) + 's';
+    grid.appendChild(f);
+  });
 }
 
 function renderDownloads() {
