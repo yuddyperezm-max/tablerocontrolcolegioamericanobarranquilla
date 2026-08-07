@@ -1,0 +1,25 @@
+name: Sincronizar flor con Supabase
+
+on:
+  repository_dispatch:
+    types: [flower_approved]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Insertar o actualizar flor en Supabase
+        run: |
+          curl -s -X POST "https://snaplyxsmtxftypygxhc.supabase.co/rest/v1/flowers" \
+            -H "apikey: ${{ secrets.SUPABASE_SERVICE_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_KEY }}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: resolution=merge-duplicates" \
+            -d '{
+              "id": "${{ github.event.client_payload.id }}",
+              "teacher_name": "${{ github.event.client_payload.teacher_name }}",
+              "subject": "${{ github.event.client_payload.subject }}",
+              "grade": "${{ github.event.client_payload.grade }}",
+              "challenge": "${{ github.event.client_payload.challenge }}",
+              "evidence_date": "${{ github.event.client_payload.evidence_date }}"
+            }'
