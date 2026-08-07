@@ -437,6 +437,8 @@
   .flower-field { background: var(--white); border-radius: 16px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin-bottom: 24px; }
   .flowers-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 16px; }
   .flower { font-size: 1.6rem; animation: bloom 0.5s ease backwards; }
+  .flower-item { display: flex; flex-direction: column; align-items: center; animation: bloom 0.5s ease backwards; width: 70px; }
+.flower-label { font-size: 0.65rem; color: var(--navy); text-align: center; margin-top: 2px; word-break: break-word; }
   @keyframes bloom { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .progress-bar-wrap { background: var(--pearl); border-radius: 50px; height: 16px; margin: 16px 0; overflow: hidden; }
   .progress-bar { background: linear-gradient(90deg, var(--teal), var(--orange)); height: 100%; border-radius: 50px; transition: width 1s ease; }
