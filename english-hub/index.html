@@ -961,11 +961,22 @@ function goToNav(pageId) {
 }
 function goToCategory(cat) { currentCategory = cat; goToNav('expressions'); }
 
+function getCurrentWeekIndex() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  let current = 0;
+  for (let i = 0; i < weeklyPhrases.length; i++) {
+    const start = new Date(weeklyPhrases[i].startDate + 'T00:00:00');
+    if (today >= start) current = i;
+  }
+  return current;
+}
 function renderWeekPage() {
+  const currentIdx = getCurrentWeekIndex();
   document.getElementById('weekNav').innerHTML = weeklyPhrases.map((w,i) =>
-    `<button class="week-nav-btn ${i===0?'active':''}" onclick="showWeek(${i},this)">Week ${w.week}</button>`
+    `<button class="week-nav-btn ${i===currentIdx?'active':''}" onclick="showWeek(${i},this)">Week ${w.week}</button>`
   ).join('');
-  showWeekContent(0);
+  showWeekContent(currentIdx);
 }
 function showWeek(idx, btn) {
   document.querySelectorAll('.week-nav-btn').forEach(b=>b.classList.remove('active'));
