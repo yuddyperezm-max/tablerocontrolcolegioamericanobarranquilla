@@ -1063,14 +1063,23 @@ async function renderGarden() {
     return;
   }
 
-  flowersData.forEach((flower, i) => {
+flowersData.forEach((flower, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'flower-item';
+    wrap.style.animationDelay = (i * 0.03) + 's';
+
     const f = document.createElement('span');
     f.className = 'flower';
     f.textContent = flowerEmojis[i % flowerEmojis.length];
-    f.title = flower.teacher_name || 'Docente';
-    f.style.animationDelay = (i * 0.03) + 's';
-    grid.appendChild(f);
-  });
+
+    const label = document.createElement('span');
+    label.className = 'flower-label';
+    label.textContent = flower.teacher_name || 'Docente';
+
+    wrap.appendChild(f);
+    wrap.appendChild(label);
+    grid.appendChild(wrap);
+  });  
 }
 
 function renderDownloads() {
@@ -1124,6 +1133,18 @@ function showModal(type){
 }
 function closeModal(e){if(e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('open');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent='✅ '+msg;t.style.display='block';setTimeout(()=>t.style.display='none',3000);}
+async function loadHomeGardenCount() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/flowers?select=id`, {
+      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+    });
+    const data = await res.json();
+    document.getElementById('homeGardenCount').textContent = data.length;
+  } catch (e) {
+    console.error('Error loading home garden count', e);
+  }
+}
+loadHomeGardenCount();  
 </script>
 </body>
 </html>
