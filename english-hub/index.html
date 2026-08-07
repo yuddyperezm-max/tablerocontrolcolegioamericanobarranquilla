@@ -889,18 +889,17 @@
 
 <script>const SUPABASE_URL = 'https://snaplyxsmtxftypygxhc.supabase.co'; const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYXBseXhzbXR4ZnR5cHlneGhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMzA4MzcsImV4cCI6MjEwMTYwNjgzN30.hRRHaXPjTk1LET6SSTp5mDZB-z2-ci-Y7iK3LBefBMA';
 const weeklyPhrases = [
-  {week:1, phrase:"Good morning, everyone!", response:"Good morning! Ready to start?", category:"Opening", context:"Use at the beginning of every class to create a warm, consistent routine."},
-  {week:2, phrase:"Please take out your materials.", response:"Take out your notebook and pencil.", category:"Instructions", context:"Use when students need to prepare for the lesson."},
-  {week:3, phrase:"Eyes on me, please.", response:"I need your attention!", category:"Attention", context:"Use to refocus students quickly and calmly."},
-  {week:4, phrase:"Well done! Great job!", response:"I'm proud of you!", category:"Praise", context:"Use generously whenever a student participates or tries."},
-  {week:5, phrase:"Work with your partner.", response:"Talk to your partner about this.", category:"Group Work", context:"Use when transitioning to pair or group activities."},
-  {week:6, phrase:"Any questions so far?", response:"Does everyone understand?", category:"Questions", context:"Use to check comprehension mid-lesson."},
-  {week:7, phrase:"Let's wrap up for today.", response:"Good work today, everyone!", category:"Closing", context:"Use at the end of class to create a consistent closing routine."},
-  {week:8, phrase:"Open your book to page...", response:"Find page... and look at number...", category:"Instructions", context:"Use when directing students to specific content."},
-  {week:9, phrase:"Repeat after me.", response:"Listen and repeat.", category:"Instructions", context:"Use for pronunciation practice or key vocabulary."},
-  {week:10, phrase:"You're doing great, keep going!", response:"I believe in you!", category:"Praise", context:"Use during individual or group work to encourage persistence."},
+  {week:1, phrase:"Good morning, everyone!", response:"Good morning! Ready to start?", category:"Opening", context:"Use at the beginning of every class to create a warm, consistent routine.", startDate:"2026-07-13", image:"assets/week1/CAB_Semana1_preview.jpg", audioMain:"assets/week1/GoodMorningeveryone.mp3", audioResponse:"assets/week1/Goodmorningreadytostart.mp3"},
+  {week:2, phrase:"Please take out your materials.", response:"Take out your notebook and pencil.", category:"Instructions", context:"Use when students need to prepare for the lesson.", startDate:"2026-07-20", image:"", audioMain:"", audioResponse:""},
+  {week:3, phrase:"Eyes on me, please.", response:"I need your attention!", category:"Attention", context:"Use to refocus students quickly and calmly.", startDate:"2026-07-27", image:"", audioMain:"", audioResponse:""},
+  {week:4, phrase:"Well done! Great job!", response:"I'm proud of you!", category:"Praise", context:"Use generously whenever a student participates or tries.", startDate:"2026-08-03", image:"", audioMain:"", audioResponse:""},
+  {week:5, phrase:"Work with your partner.", response:"Talk to your partner about this.", category:"Group Work", context:"Use when transitioning to pair or group activities.", startDate:"2026-08-10", image:"", audioMain:"", audioResponse:""},
+  {week:6, phrase:"Any questions so far?", response:"Does everyone understand?", category:"Questions", context:"Use to check comprehension mid-lesson.", startDate:"2026-08-17", image:"", audioMain:"", audioResponse:""},
+  {week:7, phrase:"Let's wrap up for today.", response:"Good work today, everyone!", category:"Closing", context:"Use at the end of class to create a consistent closing routine.", startDate:"2026-08-24", image:"", audioMain:"", audioResponse:""},
+  {week:8, phrase:"Open your book to page...", response:"Find page... and look at number...", category:"Instructions", context:"Use when directing students to specific content.", startDate:"2026-08-31", image:"", audioMain:"", audioResponse:""},
+  {week:9, phrase:"Repeat after me.", response:"Listen and repeat.", category:"Instructions", context:"Use for pronunciation practice or key vocabulary.", startDate:"2026-09-07", image:"", audioMain:"", audioResponse:""},
+  {week:10, phrase:"You're doing great, keep going!", response:"I believe in you!", category:"Praise", context:"Use during individual or group work to encourage persistence.", startDate:"2026-09-14", image:"", audioMain:"", audioResponse:""},
 ];
-
 const expressions = [
   {cat:"Opening", phrase:"Good morning, everyone!", es:"¡Buenos días a todos!"},
   {cat:"Opening", phrase:"How are you today?", es:"¿Cómo están hoy?"},
