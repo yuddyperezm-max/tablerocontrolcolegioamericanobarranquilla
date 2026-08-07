@@ -1130,7 +1130,22 @@ const modalContent={
   download:{icon:'📄',title:'Download Expression Card',body:'Your Week 1 classroom card is ready. In the full implementation, this will download a print-ready PDF to display in your classroom as a visual anchor for the week.'},
   upload:{icon:'☁️',title:'Upload Your Evidence',body:'Share a short video (max 2 minutes) of a moment when you used the expression in class. Every upload earns a 🌸 flower for Our Garden!'},
 };
-function openUploadPage() {
+function showWeekAudio(idx) {
+  const w = weeklyPhrases[idx];
+  document.getElementById('modalIcon').textContent = '🎧';
+  document.getElementById('modalTitle').textContent = 'Listen & Practice';
+  if (w.audioMain) {
+    document.getElementById('modalBody').innerHTML = `
+      <p><strong>${w.phrase}</strong></p>
+      <audio controls style="width:100%;margin:8px 0;"><source src="${w.audioMain}" type="audio/mpeg"></audio>
+      ${w.audioResponse ? `<p style="margin-top:12px;"><strong>${w.response}</strong></p><audio controls style="width:100%;"><source src="${w.audioResponse}" type="audio/mpeg"></audio>` : ''}
+    `;
+  } else {
+    document.getElementById('modalBody').innerHTML = `Audio not uploaded yet for this week. Practice saying:<br><br><strong style="font-size:1.2rem;color:#0A2D73">"${w.phrase}"</strong>`;
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+}
+  function openUploadPage() {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('page-upload').style.display = 'block';
