@@ -1056,13 +1056,27 @@ function renderExpressionCards(cat) {
       <div class="phrase-en">${e.phrase}</div>
       <div class="phrase-es">${e.es}</div>
       <div class="mini-actions">
-        <button class="mini-btn listen" onclick="showModal('listen')">🎧 Listen</button>
+        <button class="mini-btn listen" onclick="playExpressionAudio('${e.phrase.replace(/'/g,"\\'")}')">🎧 Listen</button>
         <button class="mini-btn download" onclick="showModal('download')">📄 Download</button>
       </div>
     </div>`).join('');
 }
 
-async function renderGarden() {
+function playExpressionAudio(phrase) {
+  const match = weeklyPhrases.find(w => w.type!=='consolidation' && (w.nucleoEn===phrase || w.extEn===phrase));
+  document.getElementById('modalIcon').textContent = '🎧';
+  document.getElementById('modalTitle').textContent = 'Listen & Practice';
+  if (match && match.audioMain) {
+    const audioSrc = (match.nucleoEn===phrase) ? match.audioMain : (match.audioResponse || match.audioMain);
+    document.getElementById('modalBody').innerHTML = `
+      <p><strong>${phrase}</strong></p>
+      <audio controls style="width:100%;margin:8px 0;"><source src="${audioSrc}" type="audio/mpeg"></audio>`;
+  } else {
+    document.getElementById('modalBody').innerHTML = `Audio not uploaded yet. Practice saying:<br><br><strong style="font-size:1.2rem;color:#0A2D73">"${phrase}"</strong>`;
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+}
+  async function renderGarden() {
   const goal = 100;
   const grid = document.getElementById('flowersGrid');
   grid.innerHTML = '<p style="opacity:0.6">Loading the garden…</p>';
