@@ -996,24 +996,58 @@ function showWeek(idx, btn) {
 function showWeekContent(idx) {
   const w = weeklyPhrases[idx];
   const currentIdx = getCurrentWeekIndex();
+  const badge = idx===currentIdx ? '🔴 CURRENT' : '';
   const ariImg = w.image
-    ? `<img src="${w.image}" alt="Ari - ${w.phrase}" style="width:100%;max-height:180px;object-fit:cover;border-radius:10px;margin:10px 0;">`
+    ? `<img src="${w.image}" alt="Ari" style="width:100%;border-radius:10px;margin:10px 0;">`
     : '';
+
+  if (w.type === 'consolidation') {
+    document.getElementById('weekDetailCard').innerHTML = `
+      ${ariImg}
+      <div class="week-detail-header">
+        <div class="week-num">WEEK ${w.week} — CONSOLIDACIÓN ${badge}</div>
+        <div class="phrase">Repaso del bloque</div>
+      </div>
+      <div class="week-detail-body">
+        <div class="phrase-info-item" style="margin-bottom:16px;">
+          <label>Frases a repasar</label>
+          <p>${w.reviewPhrases.map(p=>'• '+p).join('<br>')}</p>
+        </div>
+        <div class="phrase-info-item">
+          <label>Reto colectivo (video — Microsoft Forms)</label>
+          <p>${w.challenge}</p>
+        </div>
+        <div class="action-buttons">
+          <button class="action-btn accent" onclick="openUploadPage()"><span>☁️</span> Upload Evidence</button>
+        </div>
+      </div>`;
+    return;
+  }
+
   document.getElementById('weekDetailCard').innerHTML = `
     ${ariImg}
     <div class="week-detail-header">
-      <div class="week-num">WEEK ${w.week} ${idx===currentIdx?'🔴 CURRENT':''}</div>
-      <div class="phrase">${w.phrase}</div>
+      <div class="week-num">WEEK ${w.week} ${badge}</div>
+      <div class="phrase">${w.nucleoEn}</div>
     </div>
     <div class="week-detail-body">
       <div class="phrase-info-grid">
-        <div class="phrase-info-item"><label>Response / Follow-up</label><p>"${w.response}"</p></div>
-        <div class="phrase-info-item"><label>Category</label><p>📂 ${w.category}</p></div>
-        <div class="phrase-info-item" style="grid-column:1/-1"><label>When to use it</label><p>${w.context}</p></div>
+        <div class="phrase-info-item" style="border-left:4px solid #97C459;padding-left:10px;">
+          <label>NÚCLEO</label>
+          <p><strong>${w.nucleoEn}</strong><br><em>${w.nucleoEs}</em></p>
+          <p style="font-size:0.85em;color:#666;">${w.nucleoCtx}</p>
+        </div>
+        <div class="phrase-info-item" style="border-left:4px solid #EF9F27;padding-left:10px;">
+          <label>EXTENSIÓN (opcional)</label>
+          <p><strong>${w.extEn}</strong><br><em>${w.extEs}</em></p>
+          <p style="font-size:0.85em;color:#666;">${w.extCtx}</p>
+        </div>
       </div>
       <div class="action-buttons">
         <button class="action-btn primary" onclick="showWeekAudio(${idx})"><span>🎧</span> Listen</button>
-        <button class="action-btn secondary" onclick="showModal('download')"><span>📄</span> Download Card</button>
+        ${w.cardFile
+          ? `<a class="action-btn secondary" href="${w.cardFile}" download style="text-decoration:none;text-align:center;"><span>📄</span> Download Card</a>`
+          : `<button class="action-btn secondary" onclick="alert('La tarjeta de esta semana aún no ha sido subida.')"><span>📄</span> Download Card</button>`}
         <button class="action-btn accent" onclick="openUploadPage()"><span>☁️</span> Upload Evidence</button>
       </div>
     </div>`;
@@ -1144,14 +1178,16 @@ function showWeekAudio(idx) {
   const w = weeklyPhrases[idx];
   document.getElementById('modalIcon').textContent = '🎧';
   document.getElementById('modalTitle').textContent = 'Listen & Practice';
-  if (w.audioMain) {
+  if (w.type === 'consolidation') {
+    document.getElementById('modalBody').innerHTML = `Esta semana es de repaso — vuelve a la semana original de cada frase para escuchar su audio.`;
+  } else if (w.audioMain) {
     document.getElementById('modalBody').innerHTML = `
-      <p><strong>${w.phrase}</strong></p>
+      <p><strong>${w.nucleoEn}</strong></p>
       <audio controls style="width:100%;margin:8px 0;"><source src="${w.audioMain}" type="audio/mpeg"></audio>
-      ${w.audioResponse ? `<p style="margin-top:12px;"><strong>${w.response}</strong></p><audio controls style="width:100%;"><source src="${w.audioResponse}" type="audio/mpeg"></audio>` : ''}
+      ${w.audioResponse ? `<p style="margin-top:12px;"><strong>${w.extEn}</strong></p><audio controls style="width:100%;"><source src="${w.audioResponse}" type="audio/mpeg"></audio>` : ''}
     `;
   } else {
-    document.getElementById('modalBody').innerHTML = `Audio not uploaded yet for this week. Practice saying:<br><br><strong style="font-size:1.2rem;color:#0A2D73">"${w.phrase}"</strong>`;
+    document.getElementById('modalBody').innerHTML = `Audio not uploaded yet for this week. Practice saying:<br><br><strong style="font-size:1.2rem;color:#0A2D73">"${w.nucleoEn}"</strong>`;
   }
   document.getElementById('modalOverlay').classList.add('open');
 }
