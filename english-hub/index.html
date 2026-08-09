@@ -952,7 +952,7 @@
 <script>const SUPABASE_URL = 'https://snaplyxsmtxftypygxhc.supabase.co'; const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNuYXBseXhzbXR4ZnR5cHlneGhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMzA4MzcsImV4cCI6MjEwMTYwNjgzN30.hRRHaXPjTk1LET6SSTp5mDZB-z2-ci-Y7iK3LBefBMA';
 const weeklyPhrases = [
   {week:1, type:"week", moment:"Apertura", startDate:"2026-07-13", nucleoEn:"Good morning, everyone!", nucleoEs:"Buenos dias a todos", nucleoCtx:"Al entrar al salon, antes de cualquier instruccion.", extEn:"Good morning! Ready to start?", extEs:"Buenos dias, listos para empezar?", extCtx:"Cuando quieres verificar disposicion desde el saludo.", image:"assets/week1/CAB_Semana1_preview.jpg", audioMain:"assets/week1/GoodMorningeveryone.mp3", audioResponse:"assets/week1/Goodmorningreadytostart.mp3", cardFile:"assets/week1/CAB_Semana1_preview.jpg"},
- {week:2, type:"week", moment:"Feedback positivo", startDate:"2026-07-20", nucleoEn:"Well done!", nucleoEs:"Muy bien", nucleoCtx:"Despues de cualquier respuesta o esfuerzo correcto.", extEn:"Excellent work! I am really proud of you.", extEs:"Excelente trabajo, estoy muy orgulloso/a de ti", extCtx:"Para reconocimiento mas elaborado.", image:"assets/week2/CAB_Semana2_Welldone.jpeg", audioMain:"assets/week2/CAB_Semana2_welldone.ogg", audioResponse:"assets/week2/CAB_Semana2_welldoneimproudofyou.ogg", cardFile:"assets/week2/CAB_Semana2_Welldone.jpeg"},
+{week:2, type:"week", moment:"Feedback positivo", startDate:"2026-07-20", nucleoEn:"Well done!", nucleoEs:"Muy bien", nucleoCtx:"Despues de cualquier respuesta o esfuerzo correcto.", extEn:"Excellent work! I am really proud of you.", extEs:"Excelente trabajo, estoy muy orgulloso/a de ti", extCtx:"Para reconocimiento mas elaborado.", image:"assets/week2/CAB_Semana2_Welldone.jpeg", audioMain:"assets/week2/CAB_Semana2_welldone.ogg", audioResponse:"assets/week2/CAB_Semana2_welldoneimproudofyou.ogg", audioResponse2:"assets/week2/CAB_Semana2_welldoneimproudofyou2.ogg", cardFile:"assets/week2/CAB_Semana2_Welldone.jpeg"},
   {week:3, type:"week", moment:"Silencio / atencion", startDate:"2026-07-27", nucleoEn:"Eyes on me, please.", nucleoEs:"Mirenme, por favor", nucleoCtx:"Cuando necesitas que el grupo te mire antes de hablar.", extEn:"Eyes on me. Stop what you are doing.", extEs:"Mirenme. Detengan lo que estan haciendo", extCtx:"Para cortar actividad y recuperar atencion total.", image:"assets/week3/CAB_Semana3_v2_preview.jpg", audioMain:"assets/week3/CAB_Semana3_Nucleo.mp3", audioResponse:"assets/week3/CAB_Semana3_extension.mp3", cardFile:"assets/week3/CAB_Semana3_v2_preview.jpg"},
   {week:4, type:"week", moment:"Cierre", startDate:"2026-08-03", nucleoEn:"See you next class!", nucleoEs:"Nos vemos en la proxima clase", nucleoCtx:"Ultima cosa que dices antes de salir.", extEn:"Good job today. See you next class!", extEs:"Buen trabajo hoy. Nos vemos en la proxima clase", extCtx:"Cierre con reconocimiento incluido.", image:"assets/week4/CAB_Semana4_Seeyou.jpeg", audioMain:"assets/week4/CAB_Semana4Nucleo.ogg", audioResponse:"assets/week4/CAB_Semana4_Extension.ogg", cardFile:"assets/week4/CAB_Semana4_Seeyou.jpeg"},
   {week:5, type:"consolidation", startDate:"2026-08-10", reviewPhrases:["Good morning, everyone!", "Well done!", "Eyes on me, please.", "See you next class!"], challenge:"Usa las 4 frases del Bloque 1 en una misma clase. Sube un video de 30 segundos contandolo.", image:"assets/week5/CAB_Sem5_LanzamientoHub.png", audioMain:"", audioResponse:"", cardFile:"assets/week5/CAB_Sem5_LanzamientoHub.png"},
@@ -1268,8 +1268,16 @@ function showWeekAudio(idx) {
     document.getElementById('modalBody').innerHTML = `
       <p><strong>${w.nucleoEn}</strong></p>
       <audio controls style="width:100%;margin:8px 0;"><source src="${w.audioMain}" type="audio/mpeg"></audio>
-      ${w.audioResponse ? `<p style="margin-top:12px;"><strong>${w.extEn}</strong></p><audio controls style="width:100%;"><source src="${w.audioResponse}" type="audio/mpeg"></audio>` : ''}
+      ${w.audioResponse ? `<p style="margin-top:12px;"><strong>${w.extEn}</strong></p><audio id="extAudioPlayer" controls style="width:100%;"><source src="${w.audioResponse}" type="audio/mpeg"></audio>` : ''}
     `;
+    if (w.audioResponse && w.audioResponse2) {
+      const extPlayer = document.getElementById('extAudioPlayer');
+      extPlayer.addEventListener('ended', function onFirstEnded() {
+        extPlayer.src = w.audioResponse2;
+        extPlayer.play();
+        extPlayer.removeEventListener('ended', onFirstEnded);
+      });
+    }
   } else {
     document.getElementById('modalBody').innerHTML = `Audio not uploaded yet for this week. Practice saying:<br><br><strong style="font-size:1.2rem;color:#0A2D73">"${w.nucleoEn}"</strong>`;
   }
