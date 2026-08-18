@@ -195,7 +195,7 @@
         <span> — Esta página se actualiza periódicamente. No requiere contraseña.</span>
       </div>
     </div>
-    <span>Última actualización: <strong>10 de agosto de 2026</strong></span>
+    <span>Última actualización: <strong>18 de agosto de 2026</strong></span>
   </div>
 
   <!-- TOP BAR -->
@@ -266,7 +266,7 @@
 
 <script>
 // ── DATOS DEL TABLERO ── (actualizar done: true/false al hacer seguimiento)
-// ÚLTIMA ACTUALIZACIÓN: 10 de agosto de 2026
+// ÚLTIMA ACTUALIZACIÓN: 18 de agosto de 2026
 
 const componentes = [
   {
@@ -300,7 +300,7 @@ const componentes = [
       { text: 'Aplicación encuesta caracterización docente', done: true },
       { text: 'Diagnóstico nivel MCER a todos los docentes (may 2026)', done: true },
       { text: 'Mapeo docente completo y análisis de brechas', done: true },
-      { text: 'Ruta 1: Inicio formación en lengua 100% docentes (jun 2026)', done: false },
+      { text: 'Ruta 1: Inicio formación en lengua 100% docentes (jun 2026)', done: true },
       { text: 'Ruta 2: Mín. 2 talleres CLIL docentes en transición (2026)', done: true },
       { text: 'Ruta 3: Coaching aula pilotaje Social Studies (activo)', done: true },
       { text: 'Certificación MCER docentes de inglés (C1)', done: false },
@@ -411,7 +411,7 @@ const fases = [
   {
     id:'f3', num:'Fase 3', title:'Formación e inicio de pilotaje', periodo:'Jun–Nov 2026', status:'pendiente',
     items:[
-      { text:'Ruta 1: Inicio formación en lengua todos los docentes (jun 2026)', done:false },
+      { text:'Ruta 1: Inicio formación en lengua todos los docentes (jun 2026)', done:true },
       { text:'Ruta 2: Talleres CLIL docentes en transición (mín. 2 talleres)', done:true},
       { text:'Ruta 3: Coaching aula pilotaje Social Studies', done:true },
       { text:'Pilotaje en áreas focalizadas con formación y planeación CLIL', done:false },
