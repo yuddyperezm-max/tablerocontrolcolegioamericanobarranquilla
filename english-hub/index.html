@@ -1268,6 +1268,7 @@ function showWeekAudio(idx) {
       <p><strong>${w.nucleoEn}</strong></p>
       <audio controls style="width:100%;margin:8px 0;"><source src="${w.audioMain}" type="audio/mpeg"></audio>
       ${w.audioResponse ? `<p style="margin-top:12px;"><strong>${w.extEn}</strong></p><audio id="extAudioPlayer" controls style="width:100%;"><source src="${w.audioResponse}" type="audio/mpeg"></audio>` : ''}
+      ${w.admEn ? `<p style="margin-top:16px;padding-top:12px;border-top:1px solid #eee;"><strong>${w.admEn}${w.admEnResponse ? ' / ' + w.admEnResponse : ''}</strong><br><span style="font-size:0.85rem;color:#888;">For administrative & support staff</span></p>${w.admAudio ? `<audio controls style="width:100%;"><source src="${w.admAudio}" type="audio/mpeg"></audio>` : ''}` : ''}
     `;
     if (w.audioResponse && w.audioResponse2) {
       const extPlayer = document.getElementById('extAudioPlayer');
