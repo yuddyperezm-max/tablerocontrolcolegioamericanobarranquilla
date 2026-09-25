@@ -1180,11 +1180,21 @@ function playExpressionAudio(phrase) {
     return flowerEmojis[hash % flowerEmojis.length];
   }
 
-  // Agrupar filas por docente: cuenta = tamaño del ramo
-  const counts = {};
+   // Agrupar filas por docente: cuenta = tamaño del ramo
+  // Normaliza para agrupar (minúsculas + un solo espacio) pero
+  // muestra el nombre tal como aparece más recientemente en Supabase.
+  function normalizeName(n) {
+    return n.trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  const counts = {};       // clave normalizada -> cantidad
+  const displayNames = {}; // clave normalizada -> nombre a mostrar
+
   flowersData.forEach(f => {
-    const name = f.teacher_name || 'Docente';
-    counts[name] = (counts[name] || 0) + 1;
+    const raw = f.teacher_name || 'Docente';
+    const key = normalizeName(raw);
+    counts[key] = (counts[key] || 0) + 1;
+    displayNames[key] = raw; // se queda con la última variante vista
   });
 
   const totalFlowers = flowersData.length;
@@ -1211,8 +1221,8 @@ function playExpressionAudio(phrase) {
     return;
   }
 
-  const names = Object.keys(counts).sort();
-  names.forEach((name, i) => {
+  const keys = Object.keys(counts).sort();
+  keys.forEach((key, i) => {
     const wrap = document.createElement('div');
     wrap.className = 'flower-item';
     wrap.style.animationDelay = (i * 0.03) + 's';
@@ -1220,13 +1230,14 @@ function playExpressionAudio(phrase) {
     const bouquet = document.createElement('span');
     bouquet.className = 'flower';
     // repite la MISMA especie tantas veces como ciclos completados (máx 4)
-    const species = speciesForName(name);
-    const n = Math.min(counts[name], 4);
+    const displayName = displayNames[key];
+    const species = speciesForName(key); // especie fija por la clave normalizada
+    const n = Math.min(counts[key], 4);
     bouquet.textContent = species.repeat(n);
 
     const label = document.createElement('span');
     label.className = 'flower-label';
-    label.textContent = name;
+    label.textContent = displayName;
 
     wrap.appendChild(bouquet);
     wrap.appendChild(label);
