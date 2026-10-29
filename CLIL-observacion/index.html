@@ -503,7 +503,7 @@ document.addEventListener('click',e=>{
   if(cb){const path=cb.closest('[data-ctr]').dataset.ctr,n=Math.max(0,(getP(rec,path)||0)+(+cb.dataset.d));if(/\.emp$/.test(path)&&N()&&n>N()){toast('No puede ser mayor que el número de estudiantes');return}setP(rec,path,n);changed();return}
   const tab=e.target.closest('[data-tab]');if(tab)showTab(tab.dataset.tab);
 });
-document.addEventListener('input',e=>{const el=e.target.closest('[data-path]');if(!el)return;setP(rec,el.dataset.path,el.value);clearTimeout(changed.t);changed.t=setTimeout(()=>changed(),350)});
+document.addEventListener('input',e=>{const cv=e.target.closest('[data-conv]');if(cv){conv[cv.dataset.conv]=cv.value;return}const el=e.target.closest('[data-path]');if(!el)return;setP(rec,el.dataset.path,el.value);clearTimeout(changed.t);changed.t=setTimeout(()=>changed(),350)});
 document.addEventListener('change',e=>{
   const s=e.target.closest('[data-add]');if(s){const k=s.dataset.add,v=s.value;if(v&&!rec.m[k].ayu.includes(v)){rec.m[k].ayu.push(v);changed()}s.value='';return}
   if(e.target.id==='classSel'){curId=e.target.value;store.set(CUR,curId);rec=load(curId);buildObs();sync();buildSel();const v=['con','rep'].find(k=>!$('#v-'+k).hidden);if(v)showTab(v)}
@@ -537,11 +537,19 @@ function flat(r){const c=cls(r.id),ao=ayuOpts(r.id),o={clase:r.id,docente:c.doce
   o.prod_adecuados=r.prod.A;o.prod_parciales=r.prod.P;o.prod_no_adecuados=r.prod.N;
   o.funciono=r.func.map(x=>lab(O.func,x)).join(' | ');o.apoyos_docente=r.apD.map(x=>lab(O.apD,x)).join(' | ');o.apoyos_estudiantes=r.apE.map(x=>lab(O.apE,x)).join(' | ');
   o.doc_comodidad=lab(O.comodo,r.doc.comodo);o.doc_cambio=r.doc.cambio;o.doc_porque=r.doc.porque;o.doc_apoyo=lab(O.apD,r.doc.apoyo);
+  if(r.conv){CONV.forEach(([k])=>o['conclusion_'+k]=r.conv[k]||'');o.conclusion_coincide_docente=lab(COINC,r.conv.coinc)}
   if(r.consenso){o.sin_acuerdo=r.pendientes;Object.entries(r.acuerdo||{}).forEach(([b,s])=>o['acuerdo_'+b]=`${s.a}/${s.n}`)}return o}
 const toCSV=rows=>{const cols=[...new Set(rows.flatMap(Object.keys))],q=v=>{v=v==null?'':String(v);return /[",;\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};return '﻿'+cols.join(';')+'\n'+rows.map(r=>cols.map(c=>q(r[c])).join(';')).join('\n')};
 
 /* ---------- Comparar ---------- */
 let R1=null,R2=null,cmp=null,cons=null;
+const CONV=[['frase','La clase en una frase','¿Qué dirías de esta clase en una sola frase?'],
+ ['mantener','Qué vale la pena mantener o mostrar a otros docentes',''],
+ ['apoyo','Apoyo más urgente para este docente y para estos estudiantes',''],
+ ['condiciones','Condiciones que el Colegio tendría que resolver','Tiempo, materiales, organización u otras'],
+ ['ajustes','Ajustes para nuestra próxima observación','Lo que no pudimos ver o registrar bien; cambios a la herramienta o a la ubicación en el salón']];
+const COINC=[['si','Sí'],['parte','En parte'],['no','No'],['nd','No lo mencionó']];
+let conv={coinc:''};
 function spec(a){const ao=ayuOpts(a.id),f=[];
   M.forEach(([k])=>{f.push({g:'Momentos',path:`m.${k}.des`,label:`${k} · cómo se desarrolló`,type:'cat',opts:O.des});
     f.push({g:'Momentos',path:`m.${k}.ingD`,label:`${k} · inglés del docente`,type:'cat',opts:O.ingD});
@@ -580,7 +588,8 @@ document.addEventListener('change',e=>{const m=e.target.id&&e.target.id.match(/^
   if(e.target.id==='multiIn'){const fs=[...e.target.files];Promise.all(fs.map(f=>f.text().then(t=>{try{return parseRec(t)}catch(_){return null}}))).then(rs=>{const ok=rs.filter(Boolean);$('#multiN').textContent=`${ok.length} de ${fs.length} archivos válidos`;if(ok.length)download('CLIL_tabla_clases.csv',toCSV(ok.map(flat)),'text/csv')})}});
 document.addEventListener('click',e=>{
   if(e.target.id==='useMine'){R1=JSON.parse(JSON.stringify(rec));$('#cs1').textContent=desc(R1);toast('Tu registro quedó como Registro 1')}
-  if(e.target.id==='doCmp'){[1,2].forEach(i=>{const t=$('#ct'+i).value.trim();if(t){try{const r=parseRec(t);if(i===1)R1=r;else R2=r;$('#cs'+i).textContent=desc(r)}catch(_){toast('El texto del registro '+i+' no es válido')}}});
+  const cc=e.target.closest('[data-coinc]');if(cc){conv.coinc=conv.coinc===cc.dataset.coinc?'':cc.dataset.coinc;$$('#ccCoinc .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.coinc===conv.coinc));return}
+  if(e.target.id==='doCmp'){conv={coinc:''};[1,2].forEach(i=>{const t=$('#ct'+i).value.trim();if(t){try{const r=parseRec(t);if(i===1)R1=r;else R2=r;$('#cs'+i).textContent=desc(r)}catch(_){toast('El texto del registro '+i+' no es válido')}}});
     if(!R1||!R2){toast('Carga los dos registros');return}if(R1.id!==R2.id){toast('Los registros son de clases distintas');return}cmp=compare(R1,R2);renderCmp()}
   if(e.target.id==='expCons'){buildCons();download(fileBase(cons)+'.json',JSON.stringify(cons,null,1),'application/json')}
   if(e.target.id==='repCons'){buildCons();repSrc='cons';showTab('rep')}
@@ -593,7 +602,11 @@ function renderCmp(){const {rows,st}=cmp,tot=Object.values(st).reduce((a,s)=>({a
     else ctl=`<input type="number" min="0" id="cv${i}" placeholder="Número">`;
     h+=`<tr class="dis"><td>${esc(r.sp.label)}${r.label2?`<br><strong>${esc(r.label2)}</strong>`:''}${r.note?`<br><span class="note">${esc(r.note)}</span>`:''}</td><td>${esc(r.va)}</td><td>${esc(r.vb)}</td><td>${ctl}</td></tr>`});
   if(!dis.length)h+='<tr><td colspan="4">No hay diferencias.</td></tr>';
-  h+=`</tbody></table></div><div class="actions"><button type="button" class="btn" id="expCons">${canDL()?'Guardar registro acordado':'Copiar registro acordado'}</button><button type="button" class="btn ghost" id="repCons">Ver reporte acordado</button></div></article>`;
+  h+=`</tbody></table></div></article>`;
+  h+=`<article class="blk" id="blk-conv"><h3 class="ct">Conclusiones de la conversación</h3><p class="note">Escriban juntos lo que concluyeron. Empiecen por los hechos y luego pasen a la interpretación. Se habla de la clase, no del docente.</p>
+    ${CONV.map(([k,t,ph])=>`<div class="field"><label for="cc-${k}">${t}</label><textarea id="cc-${k}" data-conv="${k}" placeholder="${esc(ph)}">${esc(conv[k]||'')}</textarea></div>`).join('')}
+    <div class="field"><span class="lbl">¿El apoyo urgente coincide con lo que dijo el docente?</span><div class="chips" id="ccCoinc">${COINC.map(([v,t])=>`<button type="button" class="chip" data-coinc="${v}" aria-pressed="${conv.coinc===v}">${t}</button>`).join('')}</div></div>`;
+  h+=`<div class="actions"><button type="button" class="btn" id="expCons">${canDL()?'Guardar registro acordado':'Copiar registro acordado'}</button><button type="button" class="btn ghost" id="repCons">Ver reporte acordado</button></div></article>`;
   $('#conOut').innerHTML=h}
 function buildCons(){const o1=R1.rol==='O1'?R1:R2.rol==='O1'?R2:R1,c=JSON.parse(JSON.stringify(o1));
   c.consenso=true;c.obs=`${R1.obs||'?'} + ${R2.obs||'?'}`;c.rol='Acordado';c.doc=JSON.parse(JSON.stringify(o1.doc));
@@ -606,6 +619,7 @@ function buildCons(){const o1=R1.rol==='O1'?R1:R2.rol==='O1'?R2:R1,c=JSON.parse(
     else if(r.sp.type==='emp'){getP(c,r.sp.path).emp=+v;en.acordado=v}
     else{setP(c,r.sp.path,+v);en.acordado=v}
     log.push(en)});
+  c.conv=JSON.parse(JSON.stringify(conv));
   c.diferencias=log;c.pendientes=pend;c.acuerdo=cmp.st;c.updated=new Date().toISOString();cons=c;return c}
 
 /* ---------- Reporte ---------- */
@@ -633,6 +647,7 @@ function repHTML(r){const c=cls(r.id),p=plan(r.id),ao=ayuOpts(r.id),n=N(r);
   h+=`<h3>Qué funcionó</h3><p>${esc(r.func.map(x=>lab(O.func,x)).join(' · ')||'—')}</p>`;
   h+=`<h3>Apoyos para 2027</h3><p><strong>Docente:</strong> ${esc(r.apD.map(x=>lab(O.apD,x)).join(' · ')||'—')}<br><strong>Estudiantes:</strong> ${esc(r.apE.map(x=>lab(O.apE,x)).join(' · ')||'—')}</p>`;
   if(Object.values(r.doc).some(Boolean))h+=`<h3>Conversación con el docente</h3>`+T(['Pregunta','Respuesta'],[['¿Cómo se sintió?',esc(lab(O.comodo,r.doc.comodo)||'—')],['Momento que más cambió',esc(lab(O.cambio,r.doc.cambio)||'—')+(r.doc.porque?': '+esc(r.doc.porque):'')],['Apoyo que le ayudaría',esc(lab(O.apD,r.doc.apoyo)||'—')]]);
+  if(r.conv&&(CONV.some(([k])=>r.conv[k])||r.conv.coinc))h+=`<h3>Conclusiones de la conversación entre observadores</h3>`+T(['Tema','Conclusión'],CONV.filter(([k])=>r.conv[k]).map(([k,t])=>[t,esc(r.conv[k])]).concat(r.conv.coinc?[['¿El apoyo urgente coincide con lo que dijo el docente?',esc(lab(COINC,r.conv.coinc))]]:[]));
   if(r.diferencias&&r.diferencias.length)h+=`<h3>Diferencias y acuerdos</h3>`+T(['Pregunta','Registro 1','Registro 2','Acordado'],r.diferencias.map(d=>[esc(d.pregunta),esc(d.r1),esc(d.r2),esc(d.acordado)]));
   h+=`<p class="note">Registro descriptivo del pilotaje CLIL 2026. Las diferencias con lo planeado describen lo que es posible en el aula; no evalúan al docente. Generado ${new Date().toLocaleString('es-CO')}.</p>`;return h}
 
